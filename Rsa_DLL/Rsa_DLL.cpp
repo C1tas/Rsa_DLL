@@ -291,8 +291,9 @@ long long decode(long long c, long long d, long long modulus) {
 int return_string(char tmp_str[20480]) {
 	
 	memcpy(tmp_str, result_buffer, strlen(result_buffer));
+	memset(result_buffer, 0, sizeof(result_buffer) / sizeof(char));
 	
-	
+ 	 
 	//printf(tmp_str);
 	//printf(result_buffer);
 	/*
