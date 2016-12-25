@@ -13,6 +13,9 @@
 #define DEBUG 1
 
 char result_buffer[20480];
+char thousand_prime_result[20480];
+char miller_rabin_result[20480];
+
 
 //extern "C" _declspec(dllexport) int add(int x, int y);    // 声明为C编译、链接方式的外部函数
 //extern "C" _declspec(dllexport) int sub(int x, int y);    // 声明为C编译、链接方式的外部函数
@@ -26,7 +29,7 @@ extern "C" _declspec(dllexport) long long random_prime(long long min_border, lon
 extern "C" _declspec(dllexport) long long ext_gcd(long long e, long long modulus);
 extern "C" _declspec(dllexport) long long encode(long long m, long long e, long long modulus);
 extern "C" _declspec(dllexport) long long decode(long long m, long long e, long long modulus);
-extern "C" _declspec(dllexport) int return_string(char tmp_str[20480]);
+extern "C" _declspec(dllexport) int return_string(char tmp_str[20480], char tmp2_str[20480], char tmp3_str[20480]);
 
 
 int thousand_prime[] = { 2,3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73,79,83,89,97,101,103,107,
@@ -78,6 +81,7 @@ int check_prime_in_thounsand_prime(long long num) {
 	if (DEBUG) {
 		sprintf(tmp_buffer, "Doing checking in thounsand prime...\n");
 		strcat(result_buffer, tmp_buffer);
+		strcat(thousand_prime_result, tmp_buffer);
 	}
 	int i = 0;
 
@@ -90,8 +94,10 @@ int check_prime_in_thounsand_prime(long long num) {
 			if (DEBUG) {
 				sprintf(tmp_buffer, "%lld mod %d, and remainder is %lld.\n", num, thousand_prime[i], remainder);
 				strcat(result_buffer, tmp_buffer);
+				strcat(thousand_prime_result, tmp_buffer);
 				sprintf(tmp_buffer, "Thounsand checking faild, the num is a composite.\n\n");
 				strcat(result_buffer, tmp_buffer);
+				strcat(thousand_prime_result, tmp_buffer);
 			}
 			return 0;
 		}
@@ -99,6 +105,7 @@ int check_prime_in_thounsand_prime(long long num) {
 			if (DEBUG) {
 				sprintf(tmp_buffer, "%lld mod %d, and remainder is %lld.\n", num, thousand_prime[i], remainder);
 				strcat(result_buffer, tmp_buffer);
+				strcat(thousand_prime_result, tmp_buffer);
 			}
 			continue;
 		}
@@ -163,6 +170,7 @@ int check_miller_rabin(long long num) {
 	char tmp_buffer[1024];
 	sprintf(tmp_buffer, "Doing Miller_Rabin checking...\nChecking Num is %lld\n", num);
 	strcat(result_buffer, tmp_buffer);
+	strcat(miller_rabin_result, tmp_buffer);
 	long long d, s, t;
 	d = num - 1;
 	s = 0;
@@ -177,10 +185,12 @@ int check_miller_rabin(long long num) {
 		srand((unsigned)time(NULL));
 		sprintf(tmp_buffer, "This the %d time.\n", k);
 		strcat(result_buffer, tmp_buffer);
+		strcat(miller_rabin_result, tmp_buffer);
 		long long a = rand() % (num - 1 - 2 + 1) + 2;
 		if (DEBUG) {
 			sprintf(tmp_buffer, "The random num a is %lld, the factor d is %lld, the factor s is %lld.\n", a, d, s);
 			strcat(result_buffer, tmp_buffer);
+			strcat(miller_rabin_result , tmp_buffer);
 		}
 
 		k += 1;
@@ -191,6 +201,7 @@ int check_miller_rabin(long long num) {
 		if (DEBUG) {
 			sprintf(tmp_buffer, "The result of a**d mod N is %lld.\n", x);
 			strcat(result_buffer, tmp_buffer);
+			strcat(miller_rabin_result, tmp_buffer);
 		}
 		if (x == 1 || x == num - 1) {
 			continue;
@@ -202,6 +213,7 @@ int check_miller_rabin(long long num) {
 				if (DEBUG) {
 					sprintf(tmp_buffer, "The result of %lld in (0, s-1) , (a**(d * 2**r)):%lld**(%lld * 2**%lld) mod N is %lld.\n", r, a, d, r, x);
 					strcat(result_buffer, tmp_buffer);
+					strcat(miller_rabin_result, tmp_buffer);
 				}
 				if (n_x == (num - 1)) {
 					continue;
@@ -209,6 +221,7 @@ int check_miller_rabin(long long num) {
 				else if (n_x == 1 && x != num - 1) {
 					sprintf(tmp_buffer, "Mailler_Rabin checking faild, the num is a composite.\n\n");
 					strcat(result_buffer, tmp_buffer);
+					strcat(miller_rabin_result, tmp_buffer);
 					return 0;
 				}
 			}
@@ -245,7 +258,6 @@ long long random_prime(long long min_border, long long max_border) {
 			prime = prime % max_border;
 			prime += min_border;
 		}
-
 
 		// prime = (prime + 2) % new_range + min_border;
 	}
@@ -288,19 +300,14 @@ long long decode(long long c, long long d, long long modulus) {
 	return multiply_calculation_method_square(c, d, modulus);
 }
 
-int return_string(char tmp_str[20480]) {
+int return_string(char tmp_str[20480], char tmp2_str[20480], char tmp3_str[20480]) {
 	
 	memcpy(tmp_str, result_buffer, strlen(result_buffer));
+	memcpy(tmp2_str, thousand_prime_result, strlen(result_buffer));
+	memcpy(tmp3_str, miller_rabin_result, strlen(result_buffer));
 	memset(result_buffer, 0, sizeof(result_buffer) / sizeof(char));
-	
+	memset(thousand_prime_result, 0, sizeof(result_buffer) / sizeof(char));
+	memset(miller_rabin_result, 0, sizeof(result_buffer) / sizeof(char));
  	 
-	//printf(tmp_str);
-	//printf(result_buffer);
-	/*
-	printf(tmp_str);
-
-	printf(result_buffer);
-	printf("\n");
-	*/
 	return 1;
 }
